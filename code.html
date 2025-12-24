@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Aurora Diaries</title>
+    
+    <!-- React & Router Dependencies -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b83df5", // Unified primary from instructions
+                        "background-light": "#ffffff",
+                        "background-dark": "#1c1022",
+                        "surface-light": "#fdfbfc",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "3xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                    backgroundImage: {
+                        'aurora-light': 'linear-gradient(135deg, #fffafa 0%, #fdf4ff 50%, #fff0f5 100%)',
+                    },
+                    boxShadow: {
+                        'float': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'tool': '0 2px 8px -2px rgba(0,0,0,0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        .aurora-bg {
+            background-color: #ffffff;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(175, 37, 244, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 95% 40%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.01);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(217, 70, 239, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(217, 70, 239, 0.05) 1px, transparent 1px);
+        }
+        @keyframes float {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .aurora-blob {
+            animation: float 10s ease-in-out infinite;
+        }
+        .aurora-blur {
+            filter: blur(80px);
+            opacity: 0.6;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Standard Setup
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate } = ReactRouterDOM;
+
+        // --- COMPONENTS ---
+
+        // Screen 1: Dashboard
+        const DashboardScreen = () => {
+            const navigate = useNavigate();
+
+            return (
+                <div className="bg-background-light aurora-bg font-display text-slate-800 min-h-screen flex flex-col antialiased">
+                    <div className="relative mx-auto w-full max-w-md min-h-screen flex flex-col overflow-hidden bg-transparent shadow-2xl">
+                        <header className="sticky top-0 z-40 glass pt-safe-top">
+                            <div className="px-5 py-4 flex items-center justify-between">
+                                <div>
+                                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">My Diaries</h1>
+                                    <p className="text-xs text-slate-500 font-medium mt-0.5">Good morning, Writer</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 hover:bg-slate-50 transition-colors text-slate-600">
+                                        <span className="material-symbols-outlined text-[20px]">search</span>
+                                    </button>
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-slate-200">
+                                        <img alt="User avatar" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXJZguCAnKwc3TnZTfhORMiLwN3bMrQo4nNdQ-D1yYS-97QBHPR6WOXJlOCZJVVjabxXsj3raUUeNJEitkmZ6sVUVWV5zoFx2keqaFwt0McGUHrDN6qcgoN-CCnB4dTCHoAt_Ps-daYGXN347NXAKuBbcRwWDjSB86urhjEUutI2CNQJXTOr99YLm3nwGdardW8YpuG52vX_pQfLjMhnHWLkgi8HVO3aMcGjvfXM6Gp0XJ6V3ghyzZWlFcnmcw7XxEzb-RElKrRFeP"/>
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="px-5 pb-4 overflow-x-auto no-scrollbar flex gap-3">
+                                <button className="bg-primary text-white text-sm font-semibold px-4 py-1.5 rounded-full whitespace-nowrap shadow-md shadow-primary/20">All</button>
+                                <button className="bg-white hover:bg-slate-50 text-slate-600 text-sm font-medium px-4 py-1.5 rounded-full whitespace-nowrap transition-colors border border-slate-100 shadow-sm">Favorites</button>
+                                <button className="bg-white hover:bg-slate-50 text-slate-600 text-sm font-medium px-4 py-1.5 rounded-full whitespace-nowrap transition-colors border border-slate-100 shadow-sm">Personal</button>
+                                <button className="bg-white hover:bg-slate-50 text-slate-600 text-sm font-medium px-4 py-1.5 rounded-full whitespace-nowrap transition-colors border border-slate-100 shadow-sm">Work</button>
+                            </div>
+                        </header>
+                        
+                        <main className="flex-1 px-5 pt-6 pb-32 overflow-y-auto no-scrollbar">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Recent Collections</h2>
+                                <button className="text-primary text-xs font-semibold hover:text-primary/80">View All</button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                                <div onClick={() => navigate('/editor')} className="group cursor-pointer">
+                                    <div className="relative aspect-[3/4] w-full mb-3 rounded-r-xl rounded-l-sm overflow-hidden shadow-md transition-transform duration-300 group-hover:-translate-y-1">
+                                        <div className="absolute left-0 top-0 bottom-0 w-[6px] bg-white/30 z-20 backdrop-blur-sm border-r border-white/20"></div>
+                                        <div className="w-full h-full bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuASBLaJlAH9FG7ppEKv2vfWzDvxD-82St7Eanpd7ygTUkJXQY7XfTGTwsbhdg0g2uArMzPPAnFeSrVelCg_3X87a4EvTsQ1NdR2CSj7a6u_TYcK4mVy2CQFNqwtmzEtuYdUeR66kAXzSJ-3W5nIrMHllIlyf-Invnyd6whleJMWXfBv064dGTsR4oL_IhqTl8-1MaaqBhoS-Xq6xDE94diaABPxXfIVBkVe-HLho4Es6Zsm4gDIaLSAscJztajUXKId4AWIc48lP0lX')"}}>
+                                            <div className="absolute inset-0 bg-black/5"></div>
+                                            <div className="absolute top-2 right-2">
+                                                <span className="material-symbols-outlined text-white text-[20px] drop-shadow-md">favorite</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-800 text-base font-bold leading-tight truncate">Travel 2024</h3>
+                                        <p className="text-slate-500 text-xs mt-1 font-medium">Edited 2h ago</p>
+                                    </div>
+                                </div>
+
+                                <div onClick={() => navigate('/editor')} className="group cursor-pointer">
+                                    <div className="relative aspect-[3/4] w-full mb-3 rounded-r-xl rounded-l-sm overflow-hidden shadow-md transition-transform duration-300 group-hover:-translate-y-1">
+                                        <div className="absolute left-0 top-0 bottom-0 w-[6px] bg-white/30 z-20 backdrop-blur-sm border-r border-white/20"></div>
+                                        <div className="w-full h-full bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB8eAMwYDtZUECwVVz5fYlHQ_cYT9qW_-RgLx4BpBX7j2CnGp3G_VBE6_bJwwZB4mVlrva2Uk8uVJrzSXZXKCtAIzfva2-_NEKwhUqLg1JfRjA6xLg7Zn0_-BdlQdpbTDYI5fLa0XdLyJuORTIMsFvkSNUSnw-wESGz6LOjLVME5r1xckW4z44YExJFjf1ABNPQGzGZy8TEbIDk53QSdHmGdy930uToC_XElWUHfbcEl1ASkDGtvpiWFYdCpV4_nz7xrKDSrBcR0HBQ')"}}>
+                                            <div className="absolute inset-0 bg-black/5"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-800 text-base font-bold leading-tight truncate">Dream Journal</h3>
+                                        <p className="text-slate-500 text-xs mt-1 font-medium">Edited yesterday</p>
+                                    </div>
+                                </div>
+
+                                <div onClick={() => navigate('/editor')} className="group cursor-pointer">
+                                    <div className="relative aspect-[3/4] w-full mb-3 rounded-r-xl rounded-l-sm overflow-hidden shadow-md transition-transform duration-300 group-hover:-translate-y-1">
+                                        <div className="absolute left-0 top-0 bottom-0 w-[6px] bg-white/30 z-20 backdrop-blur-sm border-r border-white/20"></div>
+                                        <div className="w-full h-full bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCwlVtFc-7zG9rkmLkDQnnibjH1vSbjk1b3iAnI8ggKRWFD6pwMvHidaScCW1qFlnYop-hHJ1EjB4DHYUIfNUSblq8V4DzXxRoz5gzC2PMe0yuCsMkLBnkXN_BSIk6SyWSC70khRwdE8hpgTgqwSEk9Y7CEF3kpfrFLJg6C1gvWEDF4jyoRJrOlFhI7Jm1dAMZ_voHO36bpEQHdkaOMAhyBrtWrjoTN4u-Jk1y2jYaFifANIWT1HR8eVzggOFGoqJwe9jVVnXXVvGG')"}}>
+                                            <div className="absolute inset-0 bg-black/5"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-800 text-base font-bold leading-tight truncate">Daily Thoughts</h3>
+                                        <p className="text-slate-500 text-xs mt-1 font-medium">Edited 3 days ago</p>
+                                    </div>
+                                </div>
+
+                                <div onClick={() => navigate('/editor')} className="group cursor-pointer">
+                                    <div className="relative aspect-[3/4] w-full mb-3 rounded-r-xl rounded-l-sm overflow-hidden shadow-md transition-transform duration-300 group-hover:-translate-y-1">
+                                        <div className="absolute left-0 top-0 bottom-0 w-[6px] bg-white/30 z-20 backdrop-blur-sm border-r border-white/20"></div>
+                                        <div className="w-full h-full bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-izP6B5qmcPt4FTqrKHmjMwccJ_4g8geSXempYnCMK2Pj7M3PcK77Cl5rhCHQ4BbWsNvQDrCinTUmJrNdS1k3axUkpU4m89x6qqfK0fnzpI-nukaziV7CTeScd6A_hYXuhGUn6bK3al4HyTUO4vE94emO0zqkG0TwQjOMMuI0lTUrCwkMo6ZIM1a5cjJxVdhef3ZSOdkSMk9SxlSKwTkaSJRNjDomfYfztl7sziVgwcz7Ry_yYUdVTvvpUNGp_VLBwHd2yokxuZq-')"}}>
+                                            <div className="absolute inset-0 bg-black/5"></div>
+                                            <div className="absolute top-2 right-2">
+                                                <span className="material-symbols-outlined text-white/50 text-[20px] drop-shadow-md">lock</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-800 text-base font-bold leading-tight truncate">Secrets</h3>
+                                        <p className="text-slate-500 text-xs mt-1 font-medium">Edited 1 week ago</p>
+                                    </div>
+                                </div>
+
+                                <div onClick={() => navigate('/editor')} className="group cursor-pointer">
+                                    <div className="relative aspect-[3/4] w-full mb-3 rounded-r-xl rounded-l-sm overflow-hidden border-2 border-dashed border-slate-300 flex flex-col items-center justify-center bg-white/60 hover:bg-white/90 transition-colors">
+                                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-[24px]">add</span>
+                                        </div>
+                                        <span className="text-xs text-slate-500 font-semibold group-hover:text-primary transition-colors">New Diary</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+
+                        <div className="fixed bottom-24 right-6 z-40 md:hidden">
+                            <button onClick={() => navigate('/editor')} className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-xl shadow-primary/30 hover:scale-105 transition-transform active:scale-95">
+                                <span className="material-symbols-outlined text-[28px]">edit_square</span>
+                            </button>
+                        </div>
+
+                        <nav className="fixed bottom-0 w-full max-w-md glass-nav z-50 rounded-t-3xl">
+                            <div className="flex items-center justify-between h-[84px] px-8 pb-3">
+                                <a className="flex flex-col items-center justify-center gap-1.5 group min-w-[60px] cursor-pointer" onClick={() => navigate('/')}>
+                                    <div className="text-primary bg-primary/10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                                        <span className="material-symbols-outlined text-[24px] fill-1">grid_view</span>
+                                    </div>
+                                    <span className="text-[11px] font-semibold text-primary">Diaries</span>
+                                </a>
+                                <a className="flex flex-col items-center justify-center gap-1.5 group min-w-[60px] cursor-pointer">
+                                    <div className="text-slate-400 group-hover:text-primary group-hover:bg-primary/5 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                                        <span className="material-symbols-outlined text-[24px]">calendar_month</span>
+                                    </div>
+                                    <span className="text-[11px] font-medium text-slate-400 group-hover:text-primary">Calendar</span>
+                                </a>
+                                <a className="flex flex-col items-center justify-center gap-1.5 group min-w-[60px] cursor-pointer">
+                                    <div className="text-slate-400 group-hover:text-primary group-hover:bg-primary/5 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                                        <span className="material-symbols-outlined text-[24px]">insights</span>
+                                    </div>
+                                    <span className="text-[11px] font-medium text-slate-400 group-hover:text-primary">Insights</span>
+                                </a>
+                                <a className="flex flex-col items-center justify-center gap-1.5 group min-w-[60px] cursor-pointer">
+                                    <div className="text-slate-400 group-hover:text-primary group-hover:bg-primary/5 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                                        <span className="material-symbols-outlined text-[24px]">settings</span>
+                                    </div>
+                                    <span className="text-[11px] font-medium text-slate-400 group-hover:text-primary">Settings</span>
+                                </a>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            );
+        };
+
+        // Screen 2: Editor
+        const EditorScreen = () => {
+            const navigate = useNavigate();
+
+            return (
+                <div className="bg-background-light font-display text-slate-800 antialiased overflow-hidden selection:bg-primary/20">
+                    <div className="relative h-screen w-full flex flex-col overflow-hidden">
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-gradient-to-br from-indigo-50/50 via-white to-fuchsia-50/50">
+                            <div className="aurora-blob absolute -top-20 -right-20 w-96 h-96 bg-fuchsia-200/20 rounded-full blur-[80px]"></div>
+                            <div className="aurora-blob absolute -bottom-40 -left-20 w-[500px] h-[500px] bg-indigo-200/20 rounded-full blur-[100px]" style={{animationDelay: "-2s"}}></div>
+                            <div className="aurora-blob absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-[600px] max-h-[600px] bg-pink-100/30 rounded-full blur-[90px]" style={{animationDelay: "-5s"}}></div>
+                        </div>
+                        <header className="relative z-20 flex items-center justify-between px-4 pt-12 pb-4 bg-white/50 backdrop-blur-md border-b border-white/40">
+                            <button onClick={() => navigate('/dashboard')} className="flex size-10 items-center justify-center rounded-full text-slate-600 hover:bg-black/5 transition-colors">
+                                <span className="material-symbols-outlined text-[24px]">arrow_back_ios_new</span>
+                            </button>
+                            <div className="flex flex-col items-center">
+                                <div className="flex items-center gap-2">
+                                    <h2 className="text-slate-800 text-lg font-bold tracking-tight">Monday, Oct 24</h2>
+                                    <button className="p-1 rounded-full hover:bg-black/5 transition-colors text-primary">
+                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                    </button>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium bg-white/60 px-2 py-0.5 rounded-full">
+                                    <span className="size-1.5 rounded-full bg-emerald-400"></span>
+                                    Saved
+                                </div>
+                            </div>
+                            <button onClick={() => navigate('/dashboard')} className="flex h-9 items-center justify-center rounded-full bg-primary/10 px-5 text-primary font-bold text-sm hover:bg-primary/20 transition-colors">
+                                Done
+                            </button>
+                        </header>
+                        <main className="relative z-10 flex-1 w-full overflow-y-auto overflow-x-hidden no-scrollbar pb-36">
+                            <div className="absolute inset-0 grid-pattern pointer-events-none h-full min-h-screen w-full opacity-60"></div>
+                            <div className="relative px-6 py-6 max-w-3xl mx-auto min-h-screen">
+                                <div className="group relative mb-8 w-full aspect-[3/1] md:aspect-[4/1] overflow-hidden rounded-3xl bg-slate-50 shadow-sm ring-1 ring-slate-100">
+                                    <div className="absolute inset-0 bg-cover bg-center opacity-90 group-hover:opacity-100 transition-opacity duration-500" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvWl6KzwsSDE2nVN66VafiSwTqOvvUYu9c7HoNj28wUlv8C2VfSBymacSGtswtj8DHtT_SOBaKSQI7ZHZHCZR8-8MxSnk-bSzbMN3v1nfpjeOQSlbAkhZXyr29nfQzeR3uI0KI59_OMplc1OCj975keFED7PNkKff-r9ZTu_ant493NUiQ_TS3XBjdG3WvrmcbW7zMUKmlYFziwqNSR0Dxbo0G1GELqkmce5Z3lGyzGtO-Ogij9bkOINvHs6mfgAdIYYpvtFDh4SO6')"}}>
+                                    </div>
+                                    <div className="absolute top-3 right-3">
+                                        <button className="flex items-center gap-1.5 bg-white/80 backdrop-blur-md text-slate-700 text-xs font-bold px-3 py-1.5 rounded-full border border-white/60 hover:bg-white transition shadow-sm">
+                                            <span className="material-symbols-outlined text-[14px] text-primary">auto_awesome</span>
+                                            Generate Cover
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="mb-6 pl-1">
+                                    <input className="w-full bg-transparent text-[40px] font-bold text-slate-900 placeholder-slate-300 border-none p-0 focus:ring-0 tracking-tight leading-tight" placeholder="Title" type="text" defaultValue="Dear Diary..."/>
+                                </div>
+                                <div className="space-y-6 text-slate-600 text-[17px] leading-loose font-normal pl-1">
+                                    <p>Today was a magical day. The sky was painted with colors I've never seen before. It felt like the universe was whispering secrets directly to me through the wind.</p>
+                                    <p>I started the morning with a cup of warm tea, watching the sunrise paint the city in hues of gold and lavender. It reminded me that every day is a fresh start, a blank canvas waiting for us to make our mark.</p>
+                                    <div className="my-8 relative -rotate-1 hover:rotate-0 transition-transform duration-300 w-full max-w-sm mx-auto">
+                                        <div className="p-3 bg-white rounded-2xl shadow-float border border-white ring-1 ring-slate-100">
+                                            <div className="aspect-[4/3] w-full rounded-xl bg-slate-50 overflow-hidden relative">
+                                                <img alt="A cozy notebook and coffee setup on a wooden table" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBckLXYZZkoTdnveMJFC0RQu8SEBo0H-nZ4KXbTO3c7O7yk4d3mxUun0sog4f2SF1fGaJlQk9TsgzYk2sukOAt5xpX-fk1E70c3zzRg3Rv9TzirQ_bkHkalSkvhEXVHhSvTyyNPFSDQKesEbBN7yORnp8fIhd1BQVFmhQ_RBrPT5w18Zd1W0Y7LRcqZryOUmkRD4aGYmdaUG62wORYyWsVo_nVT1c39gTx2FaE3JololTKZUQMQluFJFhatV-PTk4QfA-D6aBiLKhFO"/>
+                                            </div>
+                                            <div className="pt-3 pb-1 px-1">
+                                                <p className="text-xs text-center font-handwriting text-slate-400 italic tracking-wide">Morning vibes ✨</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>Later, I spent some time sketching in the park. The trees were swaying gently, and I tried to capture that movement. I feel like my drawing skills are improving, slowly but surely.</p>
+                                    <div className="relative h-24 w-full opacity-80 my-4">
+                                        <svg className="w-full h-full overflow-visible" viewBox="0 0 400 100">
+                                            <path d="M10,50 Q50,10 90,50 T170,50 T250,50" fill="none" stroke="#d946ef" strokeDasharray="6 6" strokeLinecap="round" strokeWidth="2.5"></path>
+                                            <text fill="#d946ef" fontFamily="cursive" fontSize="22" x="20" y="80">Don't forget to smile!</text>
+                                        </svg>
+                                    </div>
+                                    <p>Ending the day with gratitude. <span className="inline-block px-2.5 py-0.5 bg-primary/5 text-primary rounded-lg text-sm font-semibold align-middle mx-1">#grateful</span> <span className="inline-block px-2.5 py-0.5 bg-teal-500/5 text-teal-600 rounded-lg text-sm font-semibold align-middle mx-1">#peace</span></p>
+                                </div>
+                            </div>
+                        </main>
+                        <div className="absolute bottom-6 left-0 right-0 z-30 flex justify-center w-full px-4">
+                            <div className="flex items-center justify-between gap-1 p-2 bg-white/95 backdrop-blur-2xl border border-white/50 rounded-full shadow-float max-w-full overflow-x-auto no-scrollbar">
+                                <button className="group relative flex flex-shrink-0 items-center justify-center w-12 h-12 rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-transform active:scale-95 mx-1">
+                                    <span className="material-symbols-outlined text-[24px]">edit</span>
+                                </button>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">ink_highlighter</span>
+                                    </button>
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">ink_eraser</span>
+                                    </button>
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">lasso_select</span>
+                                    </button>
+                                </div>
+                                <div className="w-px h-6 bg-slate-100 mx-1 flex-shrink-0"></div>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">add_photo_alternate</span>
+                                    </button>
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">sticker</span>
+                                    </button>
+                                </div>
+                                <div className="w-px h-6 bg-slate-100 mx-1 flex-shrink-0"></div>
+                                <button className="flex-shrink-0 flex items-center justify-center w-11 h-11 rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors mr-1">
+                                    <span className="material-symbols-outlined text-[20px]">keyboard</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Screen 3: Intro
+        const IntroScreen = () => {
+            const navigate = useNavigate();
+
+            return (
+                <div className="font-display bg-background-light dark:bg-background-dark text-[#161118] dark:text-white transition-colors duration-300 overflow-hidden h-screen flex flex-col">
+                    <div className="relative flex h-full min-h-screen w-full flex-col group/design-root">
+                        {/* Background Aurora Effects */}
+                        <div className="absolute top-[-10%] left-[-20%] w-[60vh] h-[60vh] bg-[#eecdfb] dark:bg-primary/20 rounded-full aurora-blur pointer-events-none mix-blend-multiply dark:mix-blend-screen z-0"></div>
+                        <div className="absolute bottom-[-10%] right-[-20%] w-[50vh] h-[50vh] bg-[#dbeafe] dark:bg-blue-900/20 rounded-full aurora-blur pointer-events-none mix-blend-multiply dark:mix-blend-screen z-0"></div>
+                        <div className="absolute top-[30%] right-[10%] w-[30vh] h-[30vh] bg-[#fce7f3] dark:bg-pink-900/10 rounded-full aurora-blur pointer-events-none mix-blend-multiply dark:mix-blend-screen z-0"></div>
+                        
+                        {/* Top Navigation */}
+                        <div className="relative z-10 flex items-center p-4 pt-6 justify-end w-full">
+                            <button onClick={() => navigate('/dashboard')} className="flex items-center justify-center rounded-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-[#7c608a] dark:text-white/70 text-sm font-bold leading-normal tracking-wide">Skip</span>
+                            </button>
+                        </div>
+                        
+                        {/* Main Content Area */}
+                        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-4 w-full max-w-md mx-auto">
+                            {/* Hero Illustration */}
+                            <div className="w-full aspect-[4/5] relative mb-8 flex justify-center items-center">
+                                {/* Decorative angled backdrop */}
+                                <div className="absolute inset-4 bg-white/60 dark:bg-white/5 rounded-[3rem] -rotate-3 transform scale-105 backdrop-blur-sm"></div>
+                                {/* Main Image Card */}
+                                <div className="relative w-full h-full bg-center bg-cover rounded-[3rem] shadow-xl shadow-primary/10 overflow-hidden border-[6px] border-white dark:border-white/10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBuFrb1h8w3vnN-9HMEqEAzSJwMK2wG7kP7L9nSh42gHzM5pkPMu_GtPdYquA95Z98LQ6CUoPzeL2fodi2JYcpIOAZfsfRgRf_8OGhFTkb4KivpkNU_Qmklq4kzbrtneQP9rL6E3n3pJ4W7dJruN9B42_mmWTUi2Iwl_ZZDJwGDtpj2DxPI8TVFvoG-lNaQVLqLgSaHjfcUwVdVzQFAexO3845w2nCkE_WrEMIICLtWugd38GbIEaXIIquVIKjji1T-AXp8xwF9l2hS")'}}>
+                                </div>
+                                {/* Floating Badge Icon */}
+                                <div className="absolute -bottom-4 -right-2 bg-white dark:bg-[#2a1a33] p-3 rounded-full shadow-lg border-4 border-background-light dark:border-background-dark">
+                                    <span className="material-symbols-outlined text-3xl text-primary">auto_awesome</span>
+                                </div>
+                            </div>
+                            
+                            {/* Headline */}
+                            <h1 className="text-[#161118] dark:text-white tracking-tight text-[32px] md:text-4xl font-bold leading-[1.1] text-center mb-4 mt-2">
+                                Magic in Every Page
+                            </h1>
+                            
+                            {/* Body Text */}
+                            <p className="text-[#161118]/70 dark:text-white/70 text-base font-normal leading-relaxed text-center px-2">
+                                Design unique diary covers with generative art and write your thoughts in our beautiful Aurora-themed editor.
+                            </p>
+                        </div>
+                        
+                        {/* Footer Controls */}
+                        <div className="relative z-10 w-full px-6 pb-10 pt-2 flex flex-col items-center gap-8 max-w-md mx-auto">
+                            {/* Page Indicators */}
+                            <div className="flex flex-row items-center justify-center gap-2">
+                                <div className="h-2 w-8 rounded-full bg-primary transition-all duration-300"></div>
+                                <div className="h-2 w-2 rounded-full bg-[#e2dbe6] dark:bg-white/20"></div>
+                                <div className="h-2 w-2 rounded-full bg-[#e2dbe6] dark:bg-white/20"></div>
+                            </div>
+                            
+                            {/* Primary CTA Button */}
+                            <button onClick={() => navigate('/dashboard')} className="w-full bg-primary hover:bg-[#9a1fe0] text-white font-bold text-lg py-4 rounded-full shadow-lg shadow-primary/30 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 group">
+                                <span>Start Writing</span>
+                                <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- APP ROOT ---
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path="/" element={<IntroScreen />} />
+                        <Route path="/dashboard" element={<DashboardScreen />} />
+                        <Route path="/editor" element={<EditorScreen />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
